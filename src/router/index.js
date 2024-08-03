@@ -4,6 +4,7 @@ import cookies from 'js-cookie';
 import routes from './routes';
 import NProgress from 'nprogress';
 import userService from '@/services/user';
+import permissionServe from '@/services/permissions';
 import { useStore } from '@/stores/index.js';
 
 const TOKEN_KEY = 'web_token';
@@ -27,21 +28,42 @@ appRouter.beforeEach(async (to, from, next) => {
 
   const store = useStore();
   const token = cookies.get(TOKEN_KEY);
+
+  /*
+    新增登录
+   */
+  // 没有TOKEN 的情况下的处理 要么跳走 要么去登录页
+  // 如果同时满足以上两个条件（即用户未登录且试图访问非登录页面），则将导航重定向到 'AccountLogin' 页面
+  if (!token && !['AccountLogin'].includes(to.name)) {
+    next({ name: 'AccountLogin' });
+    return;
+  }
+
   // 有 TOKEN 的情况下只请求一次用户信息
   if (token && !appRouter.firstInit) {
     try {
       const userInfo = await userService.getUserInfo();
+      // 获取权限
+      const permissions = await permissionServe.getPermissions();
       store.setUserInfo(userInfo);
+      // 设置权限 响应相应的权限路由
+      store.setPermissions(permissions);
+
+      // 没有权限要么跳走，要么去提示页面
+      if (!permissions?.length) {
+        next({ name: 'AccessDenied' });
+        return;
+      }
       appRouter.firstInit = true;
     } catch (e) {
       next();
     }
   }
 
-  if (!store.userInfo?.id && to.meta.auth) {
-    next({ name: 'Home' });
-    return;
-  }
+  // if (!store.userInfo?.id && to.meta.auth) {
+  //   next({ name: 'Home' });
+  //   return;
+  // }
   next();
 });
 

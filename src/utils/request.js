@@ -1,3 +1,5 @@
+// 根据自己的业务请求，处理请求拦截和响应拦截，封装自己的方法
+
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
 import Cookies from 'js-cookie';

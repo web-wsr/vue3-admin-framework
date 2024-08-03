@@ -15,14 +15,15 @@ const props = defineProps({
 })
 
 const isOnlineSvg = computed(() => /^(https?:)/.test(props.name))
+const className = computed(() => props.class)
 </script>
 
 <template>
-    <div v-if="isOnlineSvg" :style="{ '--svg-icon-url': `url($(name))` }" class="svg-icon svg-icon-online"
+    <div v-if="isOnlineSvg" :style="{ '--svg-icon-url': `url(${name})` }" class="svg-icon svg-icon-online"
         :class="className">
     </div>
     <svg v-else class="svg-icon" :class="className" aria-hidden="true">
-        <use :xlink:href="`#icon-$(name)`" />
+        <use :xlink:href="`#icon-${name}`" />
     </svg>
 </template>
 

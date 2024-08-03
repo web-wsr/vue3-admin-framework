@@ -4,12 +4,18 @@ import { defineStore } from 'pinia';
 export const useStore = defineStore('main', {
   state: () => {
     return {
-      userInfo: null
+      userInfo: null,
+      permissions: ['role-index', 'manager-index', 'article-index', 'Article-classify']
     };
   },
   actions: {
     setUserInfo(userInfo) {
       this.userInfo = userInfo;
+    },
+    setPermissions(permission) {
+      this.permissions = permission;
     }
   }
 });
+
+export default useStore;
